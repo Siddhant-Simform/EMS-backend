@@ -15,7 +15,10 @@ if (isPlaceholder) {
     logging: false
   });
 } else {
-  console.log(`🔌 Attempting connection to Azure Managed PostgreSQL at ${process.env.DB_HOST}...`);
+  const useSSL = process.env.DB_SSL === 'true' || 
+                 (process.env.DB_HOST && process.env.DB_HOST.includes('azure.com'));
+
+  console.log(`🔌 Attempting connection to PostgreSQL at ${process.env.DB_HOST}...`);
   sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
@@ -24,12 +27,12 @@ if (isPlaceholder) {
       host: process.env.DB_HOST,
       port: process.env.DB_PORT || 5432,
       dialect: 'postgres',
-      dialectOptions: {
+      dialectOptions: useSSL ? {
         ssl: {
           require: true,
           rejectUnauthorized: false // Necessary for Azure PostgreSQL
         }
-      },
+      } : {},
       logging: false
     }
   );
