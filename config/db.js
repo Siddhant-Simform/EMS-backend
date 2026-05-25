@@ -49,14 +49,7 @@ const testConnection = async () => {
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
     if (!isPlaceholder) {
-      console.log('🔄 Falling back to SQLite to maintain app functionality...');
-      sequelize = new Sequelize({
-        dialect: 'sqlite',
-        storage: path.join(__dirname, '../database.sqlite'),
-        logging: false
-      });
-      await sequelize.authenticate();
-      console.log('✅ SQLite fallback database connected successfully.');
+      throw new Error(`Database connection failed: ${error.message}`);
     }
   }
 };
@@ -64,4 +57,5 @@ const testConnection = async () => {
 module.exports = {
   sequelize,
   testConnection
+  
 };

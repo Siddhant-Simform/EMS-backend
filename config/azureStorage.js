@@ -5,13 +5,16 @@ const path = require('path');
 let blobServiceClient = null;
 let containerClient = null;
 
-const isAzureConfigured = process.env.AZURE_STORAGE_CONNECTION_STRING &&
-  !process.env.AZURE_STORAGE_CONNECTION_STRING.includes('your_account_name') &&
-  !process.env.AZURE_STORAGE_CONNECTION_STRING.includes('your_account_key');
+const rawConnectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+const isAzureConfigured = rawConnectionString &&
+  !rawConnectionString.includes('your_account_name') &&
+  !rawConnectionString.includes('your_account_key');
 
 if (isAzureConfigured) {
   try {
-    blobServiceClient = BlobServiceClient.fromConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
+    // Trim and sanitize connection string to remove any potential surrounding double quotes
+    const connectionString = rawConnectionString.trim().replace(/^"|"$/g, '');
+    blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
     const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'employees';
     containerClient = blobServiceClient.getContainerClient(containerName);
     console.log(`🔌 Azure Blob Storage client initialized. Container: "${containerName}"`);

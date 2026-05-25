@@ -42,9 +42,14 @@ const startServer = async () => {
     console.log('✅ Database models synchronized successfully.');
 
     // 3. Start Listening
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📡 API Health Check at: http://localhost:${PORT}/health`);
+    });
+
+    server.on('error', (error) => {
+      console.error('❌ Server failed to start:', error.message);
+      process.exit(1);
     });
   } catch (error) {
     console.error('❌ Failed to start the backend server:', error.message);
